@@ -3,6 +3,7 @@ import unittest
 from splitdelimiter import split_nodes_delimiter
 from textnode import TextNode,TextType
 from extractlinks import extract_markdown_images,extract_markdown_links,split_nodes_image,split_nodes_links
+from texttonodes import text_to_nodes
 
 class TestSplitDelimiter(unittest.TestCase):
     def test_code(self):
@@ -173,3 +174,45 @@ class TestSplitLinks(unittest.TestCase):
         ]
         result = split_nodes_links([node])
         self.assertEqual(result, expected)
+
+class TestTextToNodesConverter(unittest.TestCase):
+    def test_bootdev_suggested(self):
+        text = "This is **text** with an _italic_ word and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)"
+        expected = [
+            TextNode("This is ", TextType.TEXT),
+            TextNode("text", TextType.BOLD),
+            TextNode(" with an ", TextType.TEXT),
+            TextNode("italic", TextType.ITALIC),
+            TextNode(" word and a ", TextType.TEXT),
+            TextNode("code block", TextType.CODE),
+            TextNode(" and an ", TextType.TEXT),
+            TextNode("obi wan image", TextType.IMAGE, "https://i.imgur.com/fJRm4Vk.jpeg"),
+            TextNode(" and a ", TextType.TEXT),
+            TextNode("link", TextType.LINK, "https://boot.dev"),
+        ]
+        converted = text_to_nodes(text)
+        self.assertEqual(expected, converted)
+
+    def test_plain_text_only(self):
+        text = "Just a normal sentence with no formatting."
+        expected = [TextNode("Just a normal sentence with no formatting.", TextType.TEXT)]
+        converted = text_to_nodes(text)
+        self.assertEqual(expected, converted)
+
+    def test_bold_and_italic(self):
+        text = "Mixing **bold** and _italic_ styles."
+        expected = [
+            TextNode("Mixing ", TextType.TEXT),
+            TextNode("bold", TextType.BOLD),
+            TextNode(" and ", TextType.TEXT),
+            TextNode("italic", TextType.ITALIC),
+            TextNode(" styles.", TextType.TEXT),
+        ]
+        converted = text_to_nodes(text)
+        self.assertEqual(expected, converted)
+
+    def test_malformed_markdown(self):
+        text = "This is not closed **bold and not closed [link(https://bad.com)"
+        expected = [TextNode(text, TextType.TEXT)]
+        with self.assertRaises(Exception, msg="There was no closing delimiter"):    
+            converted = text_to_nodes(text)

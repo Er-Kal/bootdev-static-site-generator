@@ -1,5 +1,5 @@
 import re
-from textnode import TextNode
+from textnode import TextNode,TextType
 
 def extract_markdown_images(text):
     matches = re.findall(r"!\[([\w\s]*)\]\((https?:\/\/[^\s)]+)\)",text)
@@ -12,6 +12,9 @@ def extract_markdown_links(text):
 def split_nodes_image(old_nodes):
     output = []
     for old_node in old_nodes:
+        if old_node.text_type != TextType.TEXT:
+            output.append(old_node)
+            continue
         image_nodes = extract_markdown_images(old_node.text)
         if image_nodes is None:
             output.append(old_node)
@@ -30,6 +33,9 @@ def split_nodes_image(old_nodes):
 def split_nodes_links(old_nodes):
     output = []
     for old_node in old_nodes:
+        if old_node.text_type != TextType.TEXT:
+            output.append(old_node)
+            continue
         link_nodes = extract_markdown_links(old_node.text)
         if link_nodes is None:
             output.append(old_node)
