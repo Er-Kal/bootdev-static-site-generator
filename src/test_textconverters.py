@@ -1,6 +1,6 @@
 import unittest
 
-from splitdelimiter import split_nodes_delimiter
+from split_delimiter import split_nodes_delimiter
 from textnode import TextNode,TextType
 from extractlinks import extract_markdown_images,extract_markdown_links,split_nodes_image,split_nodes_links
 from texttonodes import text_to_nodes

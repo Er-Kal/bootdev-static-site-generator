@@ -1,6 +1,6 @@
 from extractlinks import split_nodes_image,split_nodes_links
 
-from splitdelimiter import split_nodes_delimiter
+from split_delimiter import split_nodes_delimiter
 
 from textnode import TextNode, TextType
 
